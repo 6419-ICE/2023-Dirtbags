@@ -44,41 +44,34 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 
-@Disabled
-@Autonomous(name="Auto", group="Robot")
-public class Auto extends LinearOpMode {
+
+@Autonomous(name="Straight Small Fun", group="Robot")
+public class Straight extends LinearOpMode {
 
     /* Declare OpMode members. */
     public OpenCvCamera webcam;
     PipelineBlue pipelineBlue;
     PipelineRed pipelineRed;
-    private DcMotor         leftDrive   = null;
-    private DcMotor         rightDrive  = null;
-    private DcMotor         intake      = null;
-    private Servo           servo       = null;
-    private ElapsedTime     runtime = new ElapsedTime();
-    static final double     COUNTS_PER_MOTOR_REV    = 200 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1 ;     // No External Gearing.
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION * 8/3) /
-                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
-    static final double     LEFT_CORRECTION         = 1.0;
-    static final double     RIGHT_CORRECTION        = 1.0;
-    static final double     TURN_SPEED              = 0.5;
-    int color = 1; //1 = Blue, -1 = Red
-    public Auto(int color)
-    {
-        super();
-        this.color= color;
-    }
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
+    private DcMotor intake = null;
+    private ElapsedTime runtime = new ElapsedTime();
+    static final double COUNTS_PER_MOTOR_REV = 200;    // eg: TETRIX Motor Encoder
+    static final double DRIVE_GEAR_REDUCTION = 1;     // No External Gearing.
+    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION * 8 / 3) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double DRIVE_SPEED = 0.6;
+    static final double LEFT_CORRECTION = 1.0;
+    static final double RIGHT_CORRECTION = 1.0;
+    static final double TURN_SPEED = 0.5;
+
     @Override
     public void runOpMode() {
 
-        leftDrive  = hardwareMap.get(DcMotor.class, "left");
+        leftDrive = hardwareMap.get(DcMotor.class, "left");
         rightDrive = hardwareMap.get(DcMotor.class, "right");
-        intake     = hardwareMap.get(DcMotor.class, "intake");
-        servo      = hardwareMap.get(Servo.class, "servo");
+        intake = hardwareMap.get(DcMotor.class, "intake");
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -88,148 +81,22 @@ public class Auto extends LinearOpMode {
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Starting at",  "%7d :%7d",
-                          leftDrive.getCurrentPosition(),
-                          rightDrive.getCurrentPosition());
+        telemetry.addData("Starting at", "%7d :%7d",
+                leftDrive.getCurrentPosition(),
+                rightDrive.getCurrentPosition());
         telemetry.update();
 
 
-
         //while (!opModeIsActive()) {
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        pipelineBlue = new PipelineBlue();
-        pipelineRed = new PipelineRed();
-
-        if (color == 1) {
-            webcam.setPipeline(pipelineBlue);
-        } else {
-            webcam.setPipeline(pipelineRed);
-        }
-
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                webcam.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
-            }
-            @Override
-            public void onError(int errorCode) {
-            }
-        });
-
-        double ElementZone = 0;
-        while (!opModeIsActive()) {
-            if (color == 1) {
-                ElementZone = pipelineBlue.get_element_zone();
-            } else {
-                ElementZone = pipelineRed.get_element_zone();
-            }
-            telemetry.addData("Current zone: " ,ElementZone);
-            telemetry.update();
-        }
 
 
         waitForStart();
 
-        if (color == 1) {
-            if (ElementZone == 1) {
-                encoderDrive(DRIVE_SPEED, 27, 5.0);
-                turnDegrees(TURN_SPEED, 45, 10);
-                encoderDrive(DRIVE_SPEED, 6, 10);
-                intake.setPower(0.6);
-                sleep(500);
-                intake.setPower(0);
-                sleep(1000);
-                encoderDrive(DRIVE_SPEED, -9, 10);
-                turnDegrees(TURN_SPEED, 50, 10);
-                encoderDrive(DRIVE_SPEED, 43, 10);
+        encoderDrive(DRIVE_SPEED, 48, 10);
 
-                servo.setPosition(0);
-                sleep(3000);
-                servo.setPosition(1);
-
-                sleep(1000);
-
-                encoderDrive(DRIVE_SPEED, -5, 10);
-
-                turnDegrees(TURN_SPEED, -color * 90, 10);
-
-                encoderDrive(DRIVE_SPEED, -30, 10);
-
-                turnDegrees(TURN_SPEED, -color * 90, 10);
-
-                encoderDrive(DRIVE_SPEED, -15, 5);
-
-            } else if (ElementZone == 3) {
-                encoderDrive(DRIVE_SPEED, 27, 5.0);
-                turnDegrees(TURN_SPEED, -45, 10);
-                encoderDrive(DRIVE_SPEED, 6, 10);
-                intake.setPower(0.6);
-                sleep(500);
-                intake.setPower(0);
-                sleep(1000);
-                encoderDrive(DRIVE_SPEED, -2, 10);
-                turnDegrees(TURN_SPEED, 90, 10);
-                encoderDrive(DRIVE_SPEED, 15, 10);
-                turnDegrees(TURN_SPEED, 55, 10);
-                encoderDrive(DRIVE_SPEED, 35, 10);
-
-                servo.setPosition(0);
-                sleep(3000);
-                servo.setPosition(1);
-
-                sleep(1000);
-
-                encoderDrive(DRIVE_SPEED, -5, 10);
-
-                turnDegrees(TURN_SPEED, -color * 90, 10);
-
-                encoderDrive(DRIVE_SPEED, -44, 10);
-
-                turnDegrees(TURN_SPEED, -color * 90, 10);
-
-                encoderDrive(DRIVE_SPEED, -15, 5);
-
-            } else {
-                encoderDrive(DRIVE_SPEED, 28, 5.0);
-                encoderDrive(DRIVE_SPEED, 2, 5);
-                intake.setPower(1);
-                sleep(500);
-                intake.setPower(0);
-                sleep(1000);
-                turnDegrees(TURN_SPEED, 90, 10);
-                encoderDrive(DRIVE_SPEED, 46, 10);
-
-                servo.setPosition(0);
-                sleep(3000);
-                servo.setPosition(1);
-
-                sleep(1000);
-
-                encoderDrive(DRIVE_SPEED, -5, 10);
-
-                turnDegrees(TURN_SPEED, -color * 90, 10);
-
-                encoderDrive(DRIVE_SPEED, -30, 10);
-
-                turnDegrees(TURN_SPEED, -color * 90, 10);
-
-                encoderDrive(DRIVE_SPEED, -15, 5);
-
-            }
-        } else {
-
-        }
+        turnDegrees(TURN_SPEED, 720, 20);
 
 
-
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-        sleep(1000);  // pause to display final telemetry message.
-        stop();
     }
 
     /*
@@ -240,9 +107,7 @@ public class Auto extends LinearOpMode {
      *  2) Move runs out of time
      *  3) Driver stops the OpMode running.
      */
-    public void encoderDrive(double speed,
-                             double Inches,
-                             double timeoutS) {
+    public void encoderDrive(double speed, double Inches, double timeoutS) {
         int newLeftTarget;
         int newRightTarget;
 
@@ -250,8 +115,8 @@ public class Auto extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftTarget = leftDrive.getCurrentPosition() + (int)(Inches * COUNTS_PER_INCH);
-            newRightTarget = rightDrive.getCurrentPosition() + (int)(Inches * COUNTS_PER_INCH);
+            newLeftTarget = leftDrive.getCurrentPosition() + (int) (Inches * COUNTS_PER_INCH);
+            newRightTarget = rightDrive.getCurrentPosition() + (int) (Inches * COUNTS_PER_INCH);
             leftDrive.setTargetPosition(newLeftTarget);
             rightDrive.setTargetPosition(newRightTarget);
 
@@ -271,13 +136,13 @@ public class Auto extends LinearOpMode {
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
-                   (runtime.seconds() < timeoutS) &&
-                   (leftDrive.isBusy() && rightDrive.isBusy())) {
+                    (runtime.seconds() < timeoutS) &&
+                    (leftDrive.isBusy() && rightDrive.isBusy())) {
 
                 // Display it for the driver.
-                telemetry.addData("Running to",  " %7d :%7d", newLeftTarget,  newRightTarget);
-                telemetry.addData("Currently at",  " at %7d :%7d",
-                                            leftDrive.getCurrentPosition(), rightDrive.getCurrentPosition());
+                telemetry.addData("Running to", " %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("Currently at", " at %7d :%7d",
+                        leftDrive.getCurrentPosition(), rightDrive.getCurrentPosition());
                 telemetry.update();
             }
 
@@ -293,10 +158,9 @@ public class Auto extends LinearOpMode {
         }
     }
 
-
     public void turnDegrees(double speed,
-                             double degrees,
-                             double timeoutS) {
+                            double degrees,
+                            double timeoutS) {
         int newLeftTarget;
         int newRightTarget;
 
@@ -352,19 +216,6 @@ public class Auto extends LinearOpMode {
         }
     }
 
-    public void Outtake(double speed, double milliseconds) {
-        runtime.reset();
-        while (runtime.milliseconds() < milliseconds) {
-            intake.setPower(speed);
-        }
-        intake.setPower(0);
-    }
-
-    public void Intake (double speed, double milliseconds) {
-        runtime.reset();
-        while (runtime.milliseconds() < milliseconds) {
-            intake.setPower(-speed);
-        }
-        intake.setPower(0);
-    }
 }
+
+

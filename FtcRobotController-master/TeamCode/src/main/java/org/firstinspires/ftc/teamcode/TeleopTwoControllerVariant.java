@@ -1,20 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-import static java.lang.Thread.sleep;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.Gamepad;
+
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 
-@TeleOp(name="TeleOp", group = "1")
-    public class Teleopp extends OpMode
+@TeleOp(name="TeleOpTwoControllerVariant", group = "1")
+    public class TeleopTwoControllerVariant extends OpMode
     {
         // Declare OpMode members.
         private ElapsedTime runtime = new ElapsedTime();
@@ -85,8 +82,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
                 Turbo = 0.6;
             }
 
-            if(gamepad1.left_trigger > 0.5){
-                if(gamepad1.x){
+            if(gamepad2.left_trigger > 0.5){
+                if(gamepad2.x){
                     hangerServo.setPosition(1);
                 }
                 else {
@@ -99,20 +96,20 @@ import com.qualcomm.robotcore.hardware.Gamepad;
             leftPower    = Range.clip((drive* LEFT_CORRECTION) + turn, -1.0, 1.0) ;
             rightPower   = Range.clip((drive* RIGHT_CORRECTION) - turn, -1.0, 1.0) ;
 
-            if (gamepad1.right_bumper) {
+            if (gamepad2.right_bumper) {
                 //servo.setPosition(1);
                 Intake.setPower(1);
 
-            } else if (gamepad1.left_bumper) {
+            } else if (gamepad2.left_bumper) {
                 //servo.setPosition(0);
                 Intake.setPower(-1);
             } else {
                 Intake.setPower(0);
             }
 
-            if(gamepad1.a){
+            if(gamepad2.a){
                 AcutatorForIntake.setPower(1);
-            } else if(gamepad1.b){
+            } else if(gamepad2.b){
                 AcutatorForIntake.setPower(-1);
 
             }
@@ -121,17 +118,17 @@ import com.qualcomm.robotcore.hardware.Gamepad;
             }
 
 
-            if(gamepad1.y) {
+            if(gamepad2.y) {
                 planeLaunch.setPosition(0);
             }
             else{
                 planeLaunch.setPosition(1);
             }
 
-            if(gamepad1.dpad_up){
+            if(gamepad2.dpad_up){
                 servo.setPosition(0);
             }
-            else if(gamepad1.dpad_down){
+            else if(gamepad2.dpad_down){
                 servo.setPosition(1);
             }
 
